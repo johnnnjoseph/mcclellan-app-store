@@ -49,8 +49,8 @@ services:
       #
       # Changing these later invalidates every passkey already registered.
       # ------------------------------------------------------------------
-      RP_ID: "umbrel.YOUR-TAILNET.ts.net"
-      ORIGIN: "https://umbrel.YOUR-TAILNET.ts.net"
+      RP_ID: "umbrel.taild4a659.ts.net"
+      ORIGIN: "https://umbrel.taild4a659.ts.net"
 
       RP_NAME: "openGym"
       # Require an invite code to create a new profile. Set to "0" to open
