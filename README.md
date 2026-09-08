@@ -59,36 +59,71 @@ of minutes before the UI fills in.
 ## 4. Turn on HTTPS with Tailscale Serve
 
 Tailscale gives your Umbrel a real, publicly-trusted TLS certificate on its
-`ts.net` name — without exposing anything to the internet.
+`ts.net` name — without exposing anything to the internet. This is what makes
+passkeys work.
 
-**In the Tailscale admin console**, enable both:
-- **MagicDNS** (DNS tab)
-- **HTTPS Certificates** (DNS tab)
+### 4a. Get on the tailnet
 
-**On the Umbrel**, SSH in (`ssh umbrel@umbrel.local`) and run:
+1. Install the **Tailscale** app from the official Umbrel App Store and sign in
+   (the app shows a login link to click).
+2. Install Tailscale on the devices you'll use openGym from (Mac, iPhone) and
+   sign in to the same account.
+3. In the [Tailscale admin console](https://login.tailscale.com/admin/machines),
+   confirm the Umbrel appears. Its **machine name** plus your **tailnet name**
+   form the hostname — e.g. machine `umbrel` on tailnet `taild4a659.ts.net`
+   gives `umbrel.taild4a659.ts.net`. This must match `RP_ID` exactly.
+
+### 4b. Enable HTTPS certificates
+
+In the admin console, **DNS** tab, turn on both:
+
+- **MagicDNS**
+- **HTTPS Certificates**
+
+Without the second one, Tailscale serves plain HTTP and passkey registration
+fails with an error that looks like an app bug. This is the step people skip.
+
+### 4c. Run Tailscale Serve
+
+Umbrel runs Tailscale as a **Docker container**, not on the host, so there is no
+`tailscale` command on the Umbrel itself. Run it inside the container instead.
+
+SSH in (`ssh umbrel@umbrel.local`, password is your umbrelOS dashboard
+password), then:
 
 ```bash
-sudo tailscale serve --bg --https=443 http://localhost:8095
+sudo docker exec tailscale_web_1 tailscale serve --bg --https=443 http://localhost:8095
 ```
 
-`8095` is the `port:` from `mcclellan-opengym/umbrel-app.yml`. If you changed
-it, change it here too.
+`tailscale_web_1` is the container name (umbrelOS names containers
+`<app-id>_<service>_1`, and the Tailscale app's service is `web`). The
+`localhost:8095` target resolves to the Umbrel's own port 8095 because the
+container runs with `network_mode: "host"`. `8095` is the `port:` from
+`mcclellan-opengym/umbrel-app.yml` — change it here if you changed it there.
 
-Check it with:
+Verify:
 
 ```bash
-sudo tailscale serve status
+sudo docker exec tailscale_web_1 tailscale serve status
 ```
 
-Now open `https://umbrel.tail1a2b3c.ts.net` from any device on your tailnet and
-register your passkey. Because `RP_ID` matches the hostname and the connection
-is real HTTPS, it will work.
+The config lives in the app's data volume, so it survives restarts and updates.
+To undo it:
 
-> Serving on `--https=443` maps the *whole* hostname to openGym. If you later
-> want several apps on HTTPS, give each one a path instead:
-> `sudo tailscale serve --bg --https=443 --set-path=/gym http://localhost:8095`
-> — but note that openGym expects to live at the root, so keep it on `443`
-> unless you know the app supports a subpath.
+```bash
+sudo docker exec tailscale_web_1 tailscale serve --https=443 off
+```
+
+### 4d. First sign-in
+
+Open `https://umbrel.taild4a659.ts.net` from a device on your tailnet. Confirm
+the padlock is real, **then** register your passkey — that is the irreversible
+step, not any of the ones above.
+
+> Serving on `--https=443` maps the whole hostname to openGym. Your umbrelOS
+> dashboard stays reachable over plain HTTP at `http://umbrel` on the tailnet.
+> To put more apps behind HTTPS later, give each a path with `--set-path=/name`
+> — but openGym expects to live at the root, so leave it on `443`.
 
 ---
 
