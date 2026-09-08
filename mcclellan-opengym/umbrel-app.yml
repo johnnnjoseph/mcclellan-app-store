@@ -3,7 +3,7 @@ id: mcclellan-opengym
 name: openGym
 tagline: Self-hosted gym and body-weight tracker
 category: Health & Fitness
-version: "1.0.0"
+version: "1.2.11"
 
 # Host-facing port that umbrelOS reserves for this app's proxy.
 # If umbrelOS says the port is taken, change this number and reinstall.
@@ -23,14 +23,15 @@ description: >-
   All data stays on your Umbrel in the app's own data directory.
 
 developer: Duarte Santos
-website: https://github.com/DuarteSantos8/openGym
-repo: https://github.com/DuarteSantos8/openGym
-support: https://github.com/DuarteSantos8/openGym/issues
+website: https://gitlab.com/DuarteSantos8/opengym
+repo: https://gitlab.com/DuarteSantos8/opengym
+support: https://gitlab.com/DuarteSantos8/opengym/-/issues
 submitter: John Wakim
-submission: https://github.com/DuarteSantos8/openGym
+submission: https://gitlab.com/DuarteSantos8/opengym
 
 releaseNotes: >-
-  First release in the McClellan Labs app store.
+  Repointed at the project's GitLab home and its container registry. The
+  previous GitHub images no longer exist.
 
 dependencies: []
 path: ""

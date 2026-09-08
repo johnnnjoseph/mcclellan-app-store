@@ -9,7 +9,7 @@ packaged by me, for me. Nothing is vetted by the Umbrel team.
 
 | App | Description |
 |---|---|
-| [openGym](https://github.com/DuarteSantos8/openGym) | Self-hosted gym & body-weight tracker with passkey login |
+| [openGym](https://gitlab.com/DuarteSantos8/opengym) | Self-hosted gym & body-weight tracker with passkey login |
 
 ---
 
@@ -165,14 +165,26 @@ matter:
 
 ## Notes on this openGym package
 
-- Images are pinned to `:latest` because upstream doesn't publish versioned
-  tags. Bumping `version:` in the manifest is what forces a re-pull.
+- Upstream lives on **GitLab**, not GitHub, and images come from GitLab's
+  container registry (`registry.gitlab.com/duartesantos8/opengym/...`). The old
+  GitHub repo and its ghcr.io images were deleted; anything still pointing there
+  fails the image pull with a 403.
+- Images track `:latest`. Bumping `version:` in the manifest is what forces a
+  re-pull and surfaces the Update button in umbrelOS.
+- Guest mode is off and signup is invite-only. Register the first profile
+  yourself, find your id in `data/app/db.json`, then set `ADMIN_UIDS` in the
+  compose file to get the admin dashboard.
 - Umbrel's own password prompt is disabled (`PROXY_AUTH_ADD: "false"`) since
   openGym has passkey auth and invite-only signup. Flip it to `"true"` for a
   second layer.
 - No app icon is set, so the tile renders blank. To fix, add
   `icon: https://...` (a direct link to an SVG or PNG) to `umbrel-app.yml`.
-- Data lives in three places under the app's data directory: `data/app` (your
-  profiles, passkeys and workout history — **this is the one to back up**),
-  plus `data/media/img` and `data/media/gif`, which are just the downloaded
-  exercise dataset and can be regenerated.
+- Data lives under the app's data directory: `data/app` holds profiles,
+  passkeys, workout history and the session secret — **this is the one to back
+  up**. `data/media/img` and `data/media/gif` are the downloaded exercise
+  dataset and can be regenerated. `data/coach-auth` caches AI Coach provider
+  credentials and is deliberately kept outside `data/app` so a live token never
+  ends up inside a backup.
+- The exercise images and GIFs are © Gym visual, used under the upstream
+  dataset's terms. They're downloaded at install time, not redistributed by
+  this store. Reusing them elsewhere needs your own licence.

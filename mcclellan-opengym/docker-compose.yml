@@ -6,13 +6,15 @@ services:
       # Container name pattern is <app-id>_<service-name>_1
       APP_HOST: mcclellan-opengym_web_1
       APP_PORT: 80
-      # openGym has its own passkey login and invite-only signup, so Umbrel's
-      # extra password prompt is turned off. Set this to "true" if you'd rather
-      # have Umbrel's login in front as well.
+      # openGym has its own passkey login, invite-only signup and guest mode
+      # disabled below, so Umbrel's extra password prompt is turned off.
+      # Set this to "true" if you'd rather have Umbrel's login in front as well.
       PROXY_AUTH_ADD: "false"
 
   # One-shot job: downloads the exercise image/GIF dataset (~140 MB) the first
   # time the app starts, then exits. Skipped on every start after that.
+  # Media is (c) Gym visual, used under the upstream dataset's terms - see
+  # NOTICE.md in the openGym repo. It is downloaded here, not redistributed.
   media:
     image: alpine/git:latest
     restart: "no"
@@ -32,41 +34,52 @@ services:
         fi
 
   api:
-    image: ghcr.io/duartesantos8/opengym-api:latest
+    image: registry.gitlab.com/duartesantos8/opengym/api:latest
     restart: unless-stopped
     environment:
       PORT: "3000"
       DATA_DIR: /data
 
       # ------------------------------------------------------------------
-      # EDIT THESE TWO LINES before installing.
-      #
-      # They must exactly match the hostname you type in the browser, because
-      # WebAuthn passkeys are cryptographically bound to it. With Tailscale
-      # Serve this is your Umbrel's MagicDNS name, e.g.:
-      #     RP_ID:  umbrel.tail1a2b3c.ts.net
-      #     ORIGIN: https://umbrel.tail1a2b3c.ts.net
-      #
-      # Changing these later invalidates every passkey already registered.
+      # Passkey binding. These must exactly match the hostname you type in
+      # the browser - WebAuthn passkeys are cryptographically bound to it.
+      # Changing them later invalidates every passkey already registered.
       # ------------------------------------------------------------------
       RP_ID: "umbrel.taild4a659.ts.net"
       ORIGIN: "https://umbrel.taild4a659.ts.net"
-
       RP_NAME: "openGym"
-      # Require an invite code to create a new profile. Set to "0" to open
-      # signup to anyone who can reach the app.
+
+      # Private instance: no anonymous guests, and new profiles need an invite
+      # code generated from Settings -> Admin. Set ALLOW_GUEST=1 / INVITE_ONLY=0
+      # to loosen either one.
       INVITE_ONLY: "1"
+      ALLOW_GUEST: "0"
     volumes:
+      # Profiles, passkeys, workout history, session secret. BACK THIS UP.
       - ${APP_DATA_DIR}/data/app:/data
+      # AI Coach provider credential cache. Deliberately a sibling of the data
+      # directory so a live token never lands inside a backup of it. The Coach
+      # is off unless an admin turns it on.
+      - ${APP_DATA_DIR}/data/coach-auth:/coach-auth
 
   web:
-    image: ghcr.io/duartesantos8/opengym-web:latest
+    image: registry.gitlab.com/duartesantos8/opengym/web:latest
     restart: unless-stopped
     depends_on:
       media:
         condition: service_completed_successfully
       api:
         condition: service_started
+    environment:
+      # The web image renders its nginx config at start-up from these, so no
+      # rebuild is needed. BACKEND + PORT are what /api is proxied to.
+      NGINX_PORT: "80"
+      BACKEND: api
+      PORT: "3000"
+      # Left empty on purpose: it drops the CF-Connecting-IP header so a direct
+      # client cannot forge the address the activity log records. Only set this
+      # if Cloudflare is genuinely in front of the app.
+      CF_CONNECTING_IP: ""
     volumes:
       - ${APP_DATA_DIR}/data/media/img:/usr/share/nginx/html/img:ro
       - ${APP_DATA_DIR}/data/media/gif:/usr/share/nginx/html/gif:ro
