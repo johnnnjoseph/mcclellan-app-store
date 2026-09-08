@@ -1,0 +1,6 @@
+# The ID of your app store. Every app folder in this repo must be named
+# "<id>-<app-name>", e.g. "mcclellan-opengym".
+id: mcclellan
+
+# The name shown in the umbrelOS App Store UI.
+name: McClellan Labs

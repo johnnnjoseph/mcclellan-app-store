@@ -1,0 +1,39 @@
+manifestVersion: 1
+id: mcclellan-opengym
+name: openGym
+tagline: Self-hosted gym and body-weight tracker
+category: Health & Fitness
+version: "1.0.0"
+
+# Host-facing port that umbrelOS reserves for this app's proxy.
+# If umbrelOS says the port is taken, change this number and reinstall.
+port: 8095
+
+description: >-
+  openGym is a self-hosted gym and body-weight tracker. Plan routines, log
+  workouts (supersets, warm-ups and cardio included), watch animated exercise
+  demos, and chart your body weight over time.
+
+
+  Sign-in uses passkeys, so there are no passwords to manage. Passkeys require
+  a secure (HTTPS) origin — see this app store's README for the Tailscale Serve
+  setup that provides one.
+
+
+  All data stays on your Umbrel in the app's own data directory.
+
+developer: Duarte Santos
+website: https://github.com/DuarteSantos8/openGym
+repo: https://github.com/DuarteSantos8/openGym
+support: https://github.com/DuarteSantos8/openGym/issues
+submitter: John Wakim
+submission: https://github.com/DuarteSantos8/openGym
+
+releaseNotes: >-
+  First release in the McClellan Labs app store.
+
+dependencies: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+gallery: []
