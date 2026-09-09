@@ -3,7 +3,7 @@ id: mcclellan-opengym
 name: openGym
 tagline: Self-hosted gym and body-weight tracker
 category: Health & Fitness
-version: "1.2.11-3"
+version: "1.2.11-4"
 
 # Host-facing port that umbrelOS reserves for this app's proxy.
 # If umbrelOS says the port is taken, change this number and reinstall.
@@ -16,8 +16,8 @@ description: >-
 
 
   Sign-in uses passkeys, so there are no passwords to manage. Passkeys require
-  a secure (HTTPS) origin — see this app store's README for the Tailscale Serve
-  setup that provides one.
+  a secure (HTTPS) origin — see this app store's README for the Cloudflare
+  Tunnel setup that provides one.
 
 
   All data stays on your Umbrel in the app's own data directory.
@@ -30,9 +30,9 @@ submitter: John Wakim
 submission: https://gitlab.com/DuarteSantos8/opengym
 
 releaseNotes: >-
-  ORIGIN now includes the :8095 port that Tailscale Serve publishes on.
-  WebAuthn compares the full origin including the port, so registration
-  was rejected without it.
+  Moved from the Tailscale hostname to app.musclemary.co behind a Cloudflare
+  Tunnel. This changes RP_ID, so any passkey registered under the old
+  hostname no longer works and a new profile must be created.
 
 dependencies: []
 path: ""
