@@ -3,7 +3,7 @@ id: mcclellan-opengym
 name: openGym
 tagline: Self-hosted gym and body-weight tracker
 category: Health & Fitness
-version: "1.2.11"
+version: "1.2.11-2"
 
 # Host-facing port that umbrelOS reserves for this app's proxy.
 # If umbrelOS says the port is taken, change this number and reinstall.
@@ -30,8 +30,9 @@ submitter: John Wakim
 submission: https://gitlab.com/DuarteSantos8/opengym
 
 releaseNotes: >-
-  Repointed at the project's GitLab home and its container registry. The
-  previous GitHub images no longer exist.
+  Open signup so the first profile can be created. Invite-only on a fresh
+  instance locked everyone out, because invite codes require an admin and
+  you only become one after registering.
 
 dependencies: []
 path: ""

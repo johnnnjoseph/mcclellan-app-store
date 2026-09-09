@@ -49,10 +49,17 @@ services:
       ORIGIN: "https://umbrel.taild4a659.ts.net"
       RP_NAME: "openGym"
 
-      # Private instance: no anonymous guests, and new profiles need an invite
-      # code generated from Settings -> Admin. Set ALLOW_GUEST=1 / INVITE_ONLY=0
-      # to loosen either one.
-      INVITE_ONLY: "1"
+      # BOOTSTRAP: signup is open so the first profile can be created. Invite
+      # codes come from the admin dashboard, and you only become an admin after
+      # registering, so INVITE_ONLY=1 on a fresh instance locks everyone out.
+      #
+      # Once your profile exists: read your id from data/app/db.json
+      # ("users"[].id), set ADMIN_UIDS to it, flip INVITE_ONLY back to "1",
+      # bump version: in umbrel-app.yml, push, and update the app.
+      #
+      #   ADMIN_UIDS: "your-user-id"
+      INVITE_ONLY: "0"
+      # No anonymous guest mode - a profile is the only way in.
       ALLOW_GUEST: "0"
     volumes:
       # Profiles, passkeys, workout history, session secret. BACK THIS UP.
