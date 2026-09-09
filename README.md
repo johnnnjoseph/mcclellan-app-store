@@ -92,8 +92,20 @@ SSH in (`ssh umbrel@umbrel.local`, password is your umbrelOS dashboard
 password), then:
 
 ```bash
-sudo docker exec tailscale_web_1 tailscale serve --bg --https=443 http://localhost:8095
+sudo docker exec tailscale_web_1 tailscale serve --bg --https=8095 http://localhost:8095
 ```
+
+Port 8095 rather than 443 because umbrelOS already publishes its own dashboard
+on the tailnet hostname. Serving openGym on its own HTTPS port keeps the two
+apart, at the cost of a port in the URL.
+
+**That port has to appear in `ORIGIN`.** WebAuthn compares the browser's full
+origin, port included, so `https://umbrel...ts.net:8095` is a different origin
+from `https://umbrel...ts.net`. `RP_ID` stays hostname-only. Get this wrong and
+registration fails with "Unexpected registration response origin".
+
+Moving Serve to `--https=443` later is safe and only means dropping `:8095`
+from `ORIGIN` — passkeys bind to `RP_ID`, which does not change.
 
 `tailscale_web_1` is the container name (umbrelOS names containers
 `<app-id>_<service>_1`, and the Tailscale app's service is `web`). The
@@ -111,19 +123,19 @@ The config lives in the app's data volume, so it survives restarts and updates.
 To undo it:
 
 ```bash
-sudo docker exec tailscale_web_1 tailscale serve --https=443 off
+sudo docker exec tailscale_web_1 tailscale serve --https=8095 off
 ```
 
 ### 4d. First sign-in
 
-Open `https://umbrel.taild4a659.ts.net` from a device on your tailnet. Confirm
-the padlock is real, **then** register your passkey — that is the irreversible
+Open `https://umbrel.taild4a659.ts.net:8095` from a device on your tailnet.
+Confirm the padlock is real, **then** register your passkey — that is the irreversible
 step, not any of the ones above.
 
-> Serving on `--https=443` maps the whole hostname to openGym. Your umbrelOS
-> dashboard stays reachable over plain HTTP at `http://umbrel` on the tailnet.
-> To put more apps behind HTTPS later, give each a path with `--set-path=/name`
-> — but openGym expects to live at the root, so leave it on `443`.
+> Each app you want behind HTTPS gets its own `--https=<port>` mapping this
+> way, and each one's own `ORIGIN` must carry that port. Paths
+> (`--set-path=/name`) are the alternative, but openGym expects to live at the
+> root of whatever origin serves it.
 
 ---
 

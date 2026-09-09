@@ -45,8 +45,14 @@ services:
       # the browser - WebAuthn passkeys are cryptographically bound to it.
       # Changing them later invalidates every passkey already registered.
       # ------------------------------------------------------------------
+      # RP_ID is the hostname ONLY - never a scheme, never a port. Passkeys
+      # bind to this value, so it is the one thing that must not change.
       RP_ID: "umbrel.taild4a659.ts.net"
-      ORIGIN: "https://umbrel.taild4a659.ts.net"
+      # ORIGIN is the full URL as the browser sees it, INCLUDING the port when
+      # it is not 443. Tailscale Serve publishes this app on 8095, so the port
+      # belongs here. If you later move Serve to --https=443, drop ":8095" -
+      # that is safe, because passkeys follow RP_ID, not ORIGIN.
+      ORIGIN: "https://umbrel.taild4a659.ts.net:8095"
       RP_NAME: "openGym"
 
       # BOOTSTRAP: signup is open so the first profile can be created. Invite
